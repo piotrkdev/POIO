@@ -24,12 +24,11 @@ private:
     int agility;
     int experience;
     int level;
-    int hp;
     string iconPath;
 
 public:
-    Character(string name = "", int strength = 0, int speed = 0, int agility = 0, int experience = 0, int level = 1, int hp = 100)
-        : name(name), strength(strength), speed(speed), agility(agility), experience(experience), level(level), hp(hp) {}
+    Character(string name = "", int strength = 0, int speed = 0, int agility = 0, int experience = 0, int level = 1)
+        : name(name), strength(strength), speed(speed), agility(agility), experience(experience), level(level){}
 
     string getName() const { return name; }
     int getStrength() const { return strength; }
@@ -37,7 +36,6 @@ public:
     int getAgility() const { return agility; }
     int getExperience() const { return experience; }
     int getLevel() const { return level; }
-    int getHp() const { return hp; }
 
     void setName(const string& name) { this->name = name; }
     void setStrength(int strength) { this->strength = strength; }
@@ -45,7 +43,6 @@ public:
     void setAgility(int agility) { this->agility = agility; }
     void setExperience(int experience) { this->experience = experience; }
     void setLevel(int level) { this->level = level; }
-    void setHp(int hp) { this->hp = hp; }
 
     friend std::ostream& operator<<(std::ostream& os, const Character& character);
     friend std::istream& operator>>(std::istream& is, Character& character);
@@ -62,7 +59,6 @@ std::ostream& operator<<(std::ostream& os, const Character& character)
        << character.getAgility() << endl
        << character.getExperience() << endl
        << character.getLevel() << endl
-       << character.getHp() << endl
        << character.getIconPath() << endl;
     return os;
 }
@@ -70,11 +66,11 @@ std::ostream& operator<<(std::ostream& os, const Character& character)
 std::istream& operator>>(std::istream& is, Character& character)
 {
     std::string name;
-    int strength, speed, agility, experience, level, hp;
+    int strength, speed, agility, experience, level;
     std::string iconPath;
 
     std::getline(is, name);
-    is >> std::ws >> strength >> std::ws >> speed >> std::ws >> agility >> std::ws >> experience >> std::ws >> level >> std::ws >> hp >> std::ws;
+    is >> std::ws >> strength >> std::ws >> speed >> std::ws >> agility >> std::ws >> experience >> std::ws >> level >> std::ws;
     std::getline(is, iconPath);
 
     character.setName(name);
@@ -83,7 +79,6 @@ std::istream& operator>>(std::istream& is, Character& character)
     character.setAgility(agility);
     character.setExperience(experience);
     character.setLevel(level);
-    character.setHp(hp);
     character.setIconPath(iconPath);
 
     return is;
@@ -144,11 +139,11 @@ void showCharacter(const Character* character)
         layout->addWidget(new QLabel("Zręczność:"), 3, 0);
         layout->addWidget(new QLabel(QString::number(character->getAgility())), 3, 1);
 
-        layout->addWidget(new QLabel("Punkty zdrowia:"), 4, 0);
-        layout->addWidget(new QLabel(QString::number(character->getHp())), 4, 1);
+        layout->addWidget(new QLabel("Poziom:"), 4, 0);
+        layout->addWidget(new QLabel(QString::number(character->getLevel())), 4, 1);
 
-        layout->addWidget(new QLabel("Poziom:"), 5, 0);
-        layout->addWidget(new QLabel(QString::number(character->getLevel())), 5, 1);
+        layout->addWidget(new QLabel("Punkty doświadczenia:"), 5, 0);
+        layout->addWidget(new QLabel(QString::number(character->getExperience())), 5, 1);
 
         if (!character->getIconPath().empty())
         {
@@ -192,13 +187,10 @@ void createCharacter(Character* character)
     QLabel* levelLabel = new QLabel("1");
     layout->addRow("Poziom:", levelLabel);
 
-    QLabel* hpLabel = new QLabel("100");
-    layout->addRow("Punkty zdrowia:", hpLabel);
-
     QPushButton* button = new QPushButton("Stwórz postać");
     layout->addRow(button);
 
-    QObject::connect(button, &QPushButton::clicked, [characterWindow, character, nameEdit, strengthEdit, speedEdit, agilityEdit, experienceLabel, levelLabel, hpLabel]() {
+    QObject::connect(button, &QPushButton::clicked, [characterWindow, character, nameEdit, strengthEdit, speedEdit, agilityEdit, experienceLabel, levelLabel]() {
         if (!character->getName().empty()) {
             QMessageBox msgBox;
             msgBox.setText("Postać jest już stworzona.");
@@ -215,7 +207,6 @@ void createCharacter(Character* character)
                     character->setAgility(agilityEdit->value());
                     character->setExperience(0);
                     character->setLevel(1);
-                    character->setHp(100);
                     character->setIconPath("C:/Users/Piotrek/Documents/Studia/Semestr 6/POIO/Laboratoria/RPG/icons/character");
                     characterWindow->close();
                     showCharacter(character);
@@ -232,7 +223,6 @@ void createCharacter(Character* character)
             character->setAgility(agilityEdit->value());
             character->setExperience(0);
             character->setLevel(1);
-            character->setHp(100);
             character->setIconPath("C:/Users/Piotrek/Documents/Studia/Semestr 6/POIO/Laboratoria/RPG/icons/character");
             characterWindow->close();
             showCharacter(character);
@@ -249,14 +239,11 @@ void generateEnemy(Character* enemy, int characterLevel)
     srand(time(0));
     QString enemy_names[5] = {"Ork", "Łotr", "Smok", "Szkieletor", "Zjawa"};
     enemy->setName(enemy_names[rand() % 5].toStdString());
-    enemy->setStrength(rand() % 10 + 1);
-    enemy->setSpeed(rand() % 10 + 1);
-    enemy->setAgility(rand() % 10 + 1);
+    enemy->setStrength((rand() % 10 + 1) * characterLevel);
+    enemy->setSpeed((rand() % 10 + 1) * characterLevel);
+    enemy->setAgility((rand() % 10 + 1) * characterLevel);
 
     enemy->setLevel(characterLevel);
-
-    int enemyHP = 100 + (characterLevel - 1) * 50;
-    enemy->setHp(enemyHP);
     enemy->setIconPath("C:/Users/Piotrek/Documents/Studia/Semestr 6/POIO/Laboratoria/RPG/icons/" + enemy->getName());
 }
 
@@ -291,18 +278,15 @@ void showEnemy(const Character* enemy)
         layout->addWidget(new QLabel("Zręczność:"), 3, 0);
         layout->addWidget(new QLabel(QString::number(enemy->getAgility())), 3, 1);
 
-        layout->addWidget(new QLabel("Punkty zdrowia:"), 4, 0);
-        layout->addWidget(new QLabel(QString::number(enemy->getHp())), 4, 1);
-
-        layout->addWidget(new QLabel("Poziom:"), 5, 0);
-        layout->addWidget(new QLabel(QString::number(enemy->getLevel())), 5, 1);
+        layout->addWidget(new QLabel("Poziom:"), 4, 0);
+        layout->addWidget(new QLabel(QString::number(enemy->getLevel())), 4, 1);
 
         if (!enemy->getIconPath().empty())
         {
             QPixmap pixmap(QString::fromStdString(enemy->getIconPath()));
             QLabel* iconLabel = new QLabel;
             iconLabel->setPixmap(pixmap.scaled(180, 180, Qt::KeepAspectRatio));
-            layout->addWidget(iconLabel, 0, 2, 6, 1);
+            layout->addWidget(iconLabel, 0, 2, 5, 1);
         }
     }
 
@@ -310,44 +294,51 @@ void showEnemy(const Character* enemy)
     enemyWindow->show();
 }
 
-void fight(const Character* player, const Character* enemy)
+
+void fight(Character* player, const Character* enemy)
 {
+
     QWidget* fightWindow = new QWidget;
     fightWindow->setWindowTitle("Walka");
-    fightWindow->resize(500, 200);
+    fightWindow->resize(500, 300);
 
-    QVBoxLayout* layout = new QVBoxLayout(fightWindow);
-
-    QLabel* playerLabel = new QLabel("Twoja postać:\n" + QString::fromStdString(player->getName()) + "\nSiła: " + QString::number(player->getStrength()) + "\nSzybkość: " + QString::number(player->getSpeed()) + "\nZręczność: " + QString::number(player->getAgility()));
-    QLabel* vsLabel = new QLabel;
-    QPixmap vsPixmap("C:/Users/Piotrek/Documents/Studia/Semestr 6/POIO/Laboratoria/RPG/icons/vs");
-    vsLabel->setPixmap(vsPixmap.scaled(100, 100, Qt::KeepAspectRatio));
-    QLabel* enemyLabel = new QLabel("Przeciwnik:\n" + QString::fromStdString(enemy->getName()) + "\nSiła: " + QString::number(enemy->getStrength()) + "\nSzybkość: " + QString::number(enemy->getSpeed()) + "\nZręczność: " + QString::number(enemy->getAgility()));
+    QHBoxLayout* mainLayout = new QHBoxLayout(fightWindow);
 
     QFont font;
     font.setBold(true);
-    playerLabel->setFont(font);
-    enemyLabel->setFont(font);
 
-    QHBoxLayout* topLayout = new QHBoxLayout;
-    topLayout->addWidget(playerLabel);
-    topLayout->addWidget(vsLabel);
-    topLayout->addWidget(enemyLabel);
-
+    QVBoxLayout* playerLayout = new QVBoxLayout;
+    QLabel* playerNameLabel = new QLabel(QString::fromStdString(player->getName()));
+    playerNameLabel->setFont(font);
+    QLabel* playerLabel = new QLabel("Siła: " + QString::number(player->getStrength()) + "\nSzybkość: " + QString::number(player->getSpeed()) + "\nZręczność: " + QString::number(player->getAgility()) + "\nPoziom: " + QString::number(player->getLevel()));
     QLabel* playerIconLabel = new QLabel;
     QPixmap playerIconPixmap(QString::fromStdString(player->getIconPath()));
-    playerIconLabel->setPixmap(playerIconPixmap.scaled(100, 100, Qt::KeepAspectRatio));
+    playerIconLabel->setPixmap(playerIconPixmap.scaled(180, 180, Qt::KeepAspectRatio));
 
+    playerLayout->addWidget(playerNameLabel);
+    playerLayout->addWidget(playerLabel);
+    playerLayout->addWidget(playerIconLabel);
+
+    QVBoxLayout* enemyLayout = new QVBoxLayout;
+    QLabel* enemyNameLabel = new QLabel(QString::fromStdString(enemy->getName()));
+    enemyNameLabel->setFont(font);
+    QLabel* enemyLabel = new QLabel("Siła: " + QString::number(enemy->getStrength()) + "\nSzybkość: " + QString::number(enemy->getSpeed()) + "\nZręczność: " + QString::number(enemy->getAgility()) + "\nPoziom: " + QString::number(enemy->getLevel()));
     QLabel* enemyIconLabel = new QLabel;
     QPixmap enemyIconPixmap(QString::fromStdString(enemy->getIconPath()));
-    enemyIconLabel->setPixmap(enemyIconPixmap.scaled(100, 100, Qt::KeepAspectRatio));
+    enemyIconLabel->setPixmap(enemyIconPixmap.scaled(180, 180, Qt::KeepAspectRatio));
 
-    layout->addLayout(topLayout);
-    layout->addWidget(playerIconLabel);
-    layout->addWidget(enemyIconLabel);
+    enemyLayout->addWidget(enemyNameLabel);
+    enemyLayout->addWidget(enemyLabel);
+    enemyLayout->addWidget(enemyIconLabel);
 
+    QVBoxLayout* vsLayout = new QVBoxLayout;
+    QLabel* vsLabel = new QLabel;
+    QPixmap vsPixmap("C:/Users/Piotrek/Documents/Studia/Semestr 6/POIO/Laboratoria/RPG/icons/vs");
+    vsLabel->setPixmap(vsPixmap.scaled(150, 150, Qt::KeepAspectRatio));
     QPushButton* button = new QPushButton("Walcz!");
-    layout->addWidget(button);
+
+    vsLayout->addWidget(vsLabel);
+    vsLayout->addWidget(button);
 
     QObject::connect(button, &QPushButton::clicked, [player, enemy, fightWindow]() {
         int playerTotal = player->getStrength() + player->getSpeed() + player->getAgility();
@@ -355,7 +346,8 @@ void fight(const Character* player, const Character* enemy)
 
         QString winner;
         if (playerTotal > enemyTotal) {
-            winner = "Wygrałeś!";
+            winner = "Wygrałeś! Zdobyłeś 50 punktów doświadczenia.";
+            player->setExperience(player->getExperience() + 50);
         } else if (enemyTotal > playerTotal) {
             winner = "Przegrałeś!";
         } else {
@@ -365,10 +357,66 @@ void fight(const Character* player, const Character* enemy)
         QMessageBox::information(fightWindow, "Wynik walki", winner);
 
         fightWindow->close();
+
+        if (player->getExperience() >= 100)
+        {
+            player->setLevel(player->getLevel() + 1);
+
+            QWidget* characterWindow = new QWidget;
+            characterWindow->setWindowTitle("Upgrade postaci");
+            characterWindow->resize(350, 200);
+
+            QFormLayout* layout = new QFormLayout(characterWindow);
+
+            QLabel* nameLabel = new QLabel(QString::fromStdString(player->getName()));
+            QFont font = nameLabel->font();
+            font.setBold(true);
+            nameLabel->setFont(font);
+
+            QSpinBox* strengthEdit = new QSpinBox;
+            strengthEdit->setRange(player->getStrength(), 20);
+            layout->addRow("Siła:", strengthEdit);
+
+            QSpinBox* speedEdit = new QSpinBox;
+            speedEdit->setRange(player->getSpeed(), 20);
+            layout->addRow("Szybkość:", speedEdit);
+
+            QSpinBox* agilityEdit = new QSpinBox;
+            agilityEdit->setRange(player->getAgility(), 20);
+            layout->addRow("Zręczność:", agilityEdit);
+
+            QLabel* experienceLabel = new QLabel(QString::number(player->getExperience()));
+            layout->addRow("Doświadczenie:", experienceLabel);
+
+            QLabel* levelLabel = new QLabel(QString::number(player->getLevel()));
+            layout->addRow("Poziom:", levelLabel);
+
+            QPushButton* button = new QPushButton("Ulepsz postać");
+                QObject::connect(button, &QPushButton::clicked, [player, strengthEdit, speedEdit, agilityEdit, characterWindow]() {
+                    player->setStrength(strengthEdit->value());
+                    player->setSpeed(speedEdit->value());
+                    player->setAgility(agilityEdit->value());
+                    player->setExperience(player->getExperience() - 100);
+                    characterWindow->close();
+                });
+            layout->addRow(button);
+
+            characterWindow->setLayout(layout);
+            characterWindow->show();
+        }
+
     });
+
+    mainLayout->addLayout(playerLayout);
+    mainLayout->addLayout(vsLayout);
+    mainLayout->addLayout(enemyLayout);
 
     fightWindow->show();
 }
+
+
+
+
 
 int main(int argc, char *argv[])
 {
@@ -409,6 +457,7 @@ int main(int argc, char *argv[])
     });
 
     QObject::connect(button5, &QPushButton::clicked, [&]() {
+        generateEnemy(&enemy, character.getLevel());
         fight(&character, &enemy);
     });
 
