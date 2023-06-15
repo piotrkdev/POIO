@@ -1,8 +1,7 @@
-Maciej
-4
-3
+Piotr
+10
+7
 8
-0
-1
-100
+19
+3
 C:/Users/Piotrek/Documents/Studia/Semestr 6/POIO/Laboratoria/RPG/icons/character
